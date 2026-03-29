@@ -1,12 +1,20 @@
 package com.lumbergmarilee.delivery_fee_calculator.service;
 
 import com.lumbergmarilee.delivery_fee_calculator.exception.VehicleUsageForbiddenException;
+import com.lumbergmarilee.delivery_fee_calculator.model.WeatherData;
 import com.lumbergmarilee.delivery_fee_calculator.model.enums.City;
 import com.lumbergmarilee.delivery_fee_calculator.model.enums.VehicleType;
+import com.lumbergmarilee.delivery_fee_calculator.repository.WeatherDataRepository;
 import org.springframework.stereotype.Service;
 
 @Service
 public class DeliveryFeeService {
+
+    private final WeatherDataRepository weatherDataRepository;
+
+    public DeliveryFeeService(WeatherDataRepository weatherDataRepository) {
+        this.weatherDataRepository = weatherDataRepository;
+    }
 
     private double calculateRBF(City city, VehicleType vehicleType){
         return switch (city){
@@ -31,7 +39,7 @@ public class DeliveryFeeService {
 
     private double calculateATEF(VehicleType vehicleType, double airTemperature){
         if (vehicleType == VehicleType.CAR){ return 0;}
-        // Otherwise must be bike or scooter
+        // Otherwise must be type bike or scooter
         if (airTemperature < -10){return 1.0;}
         if (airTemperature >= -10 && airTemperature <= 0){return 0.5;}
 
@@ -76,5 +84,19 @@ public class DeliveryFeeService {
         double wpef = calculateWPEF(vehicleType, weatherPhenomenon);
 
         return rbf+atef+wsef+wpef;
+    }
+
+    public double calculateFee(City city, VehicleType vehicleType){
+        String cityName = city.getName();
+        WeatherData weatherData = weatherDataRepository.findTopByStationNameOrderByTimestampDesc(cityName);
+
+        if (weatherData == null){
+            throw new RuntimeException("No weather data for "+cityName);
+        }
+
+        return calculateDeliveryFee(city, vehicleType,
+                weatherData.getAirTemperature(),
+                weatherData.getWindSpeed(),
+                weatherData.getWeatherPhenomenon());
     }
 }

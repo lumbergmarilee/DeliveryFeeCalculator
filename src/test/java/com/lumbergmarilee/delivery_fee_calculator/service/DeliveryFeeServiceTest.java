@@ -16,7 +16,7 @@ class DeliveryFeeServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new DeliveryFeeService();
+        service = new DeliveryFeeService(null);
     }
 
     // ========================
