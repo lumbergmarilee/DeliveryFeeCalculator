@@ -14,6 +14,8 @@ public class WeatherData {
     private double airTemperature;
     private double windSpeed;
     private String weatherPhenomenon;
+
+    @Column(name = "observation_timestamp")
     private LocalDateTime timestamp;
 
     public WeatherData() {}
