@@ -7,9 +7,10 @@ public enum City {
 
     private final String name;
 
-    private City(String name) {
+    City(String name) {
         this.name = name;
     }
+
     public String getName() {
         return name;
     }
