@@ -8,7 +8,10 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 
 /**
  * REST controller for the delivery fee calculation API.
@@ -16,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
  */
 @RestController
 @RequestMapping("/api")
+@Tag(name = "Delivery Fee", description = "Calculate delivery fees based on city, vehicle type, and weather")
 public class DeliveryFeeController {
 
     private final DeliveryFeeService deliveryFeeService;
@@ -32,8 +36,17 @@ public class DeliveryFeeController {
      * @param vehicleType the vehicle type (CAR, SCOOTER, or BIKE)
      * @return DeliveryFeeResponse containing the city, vehicle type, and calculated fee
      */
+    @Operation(
+            summary = "Calculate delivery fee",
+            description = "Calculates the total delivery fee based on city, vehicle type, and current weather conditions"
+    )
+    @ApiResponse(responseCode = "200", description = "Fee calculated successfully")
+    @ApiResponse(responseCode = "400", description = "Invalid input or vehicle usage forbidden due to weather")
+    @ApiResponse(responseCode = "500", description = "Weather data not available")
     @GetMapping("/delivery-fee")
-    public DeliveryFeeResponse getDeliveryFee(@RequestParam String cityName, @RequestParam String vehicleType) {
+    public DeliveryFeeResponse getDeliveryFee(
+            @Parameter(description = "City name (TALLINN, TARTU, or PÄRNU)") @RequestParam String cityName,
+            @Parameter(description = "Vehicle type (CAR, SCOOTER, or BIKE)") @RequestParam String vehicleType) {
         City city = City.valueOf(cityName.toUpperCase());
         VehicleType vehicle = VehicleType.valueOf(vehicleType.toUpperCase());
 
