@@ -116,6 +116,14 @@ http://localhost:8080/api/delivery-fee?cityName=TARTU&vehicleType=BIKE
 {
   "error": "Usage of selected vehicle type is forbidden due to wind speeds"
 }
+
+
+```
+## API Documentation
+
+While the application is running, interactive API documentation is available at:
+```
+http://localhost:8080/swagger-ui/index.html
 ```
 
 ## H2 Database Console
