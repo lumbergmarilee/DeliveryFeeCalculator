@@ -4,12 +4,12 @@ A REST API that calculates food delivery fees based on city, vehicle type, and r
 
 ## Technologies
 
-- **Java 17+** — the core programming language
-- **Spring Boot 4.x** — framework for building the REST API, dependency injection, and scheduling
-- **Spring Data JPA** — simplifies database access with automatic CRUD operations
-- **H2 Database** — lightweight in-memory database for storing weather observations
-- **JUnit 5** — unit testing framework
-- **Estonian Weather Service XML API** — external data source for real-time weather observations
+- *Java 17+* - the core programming language
+- *Spring Boot 4.x* - framework for building the REST API, dependency injection, and scheduling
+- *Spring Data JPA* - simplifies database access with automatic CRUD operations
+- *H2 Database* - lightweight in-memory database for storing weather observations
+- *JUnit 5* - unit testing framework
+- *Estonian Weather Service XML API* — external data source for real-time weather observations
 
 ## How It Works
 
@@ -19,9 +19,9 @@ The application calculates delivery fees using a combination of **regional base 
 
 **Extra fees** are added based on current weather conditions:
 
-- **Air temperature fee** (Scooter & Bike only): extra charge when temperature drops below 0°C
-- **Wind speed fee** (Bike only): extra charge when wind is between 10–20 m/s. Above 20 m/s, bike delivery is forbidden
-- **Weather phenomenon fee** (Scooter & Bike only): extra charge for snow, sleet, or rain. Delivery is forbidden during glaze, hail, or thunder
+- *Air temperature fee* (Scooter & Bike only): extra charge when temperature drops below 0°C
+- *Wind speed fee* (Bike only): extra charge when wind is between 10–20 m/s. Above 20 m/s, bike delivery is forbidden
+- *Weather phenomenon fee* (Scooter & Bike only): extra charge for snow, sleet, or rain. Delivery is forbidden during glaze, hail, or thunder
 
 Weather data is automatically imported from the Estonian Weather Service every hour and on application startup.
 
@@ -61,11 +61,11 @@ src/main/java/com/lumbergmarilee/delivery_fee_calculator/
 
 ### How the layers connect
 
-1. A **request** comes in through the **Controller** (e.g., `GET /api/delivery-fee?cityName=TARTU&vehicleType=BIKE`)
-2. The Controller calls the **Service**, which fetches the latest weather data from the **Repository**
+1. A *request* comes in through the *Controller* (e.g., `GET /api/delivery-fee?cityName=TARTU&vehicleType=BIKE`)
+2. The Controller calls the *Service*, which fetches the latest weather data from the *Repository*
 3. The Service applies the business rules (base fee + weather extra fees) and returns the total
 4. The Controller wraps the result in a JSON response and sends it back
-5. Meanwhile, the **Scheduler** keeps the weather data up to date by importing from the Estonian Weather Service every hour
+5. Meanwhile, the *Scheduler* keeps the weather data up to date by importing from the Estonian Weather Service every hour
 
 ## How to Run
 
@@ -127,6 +127,6 @@ http://localhost:8080/h2-console
 ```
 
 Login with:
-- **JDBC URL:** `jdbc:h2:mem:devdb`
-- **Username:** `sa`
-- **Password:** (leave empty)
+- *JDBC URL:* `jdbc:h2:mem:devdb`
+- *Username:* `sa`
+- *Password:* (leave empty)
