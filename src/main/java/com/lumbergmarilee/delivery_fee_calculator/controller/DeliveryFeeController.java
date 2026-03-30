@@ -1,5 +1,6 @@
 package com.lumbergmarilee.delivery_fee_calculator.controller;
 
+import com.lumbergmarilee.delivery_fee_calculator.dto.DeliveryFeeResponse;
 import com.lumbergmarilee.delivery_fee_calculator.model.enums.City;
 import com.lumbergmarilee.delivery_fee_calculator.model.enums.VehicleType;
 import com.lumbergmarilee.delivery_fee_calculator.service.DeliveryFeeService;
@@ -18,12 +19,12 @@ public class DeliveryFeeController {
     }
 
     @GetMapping("/delivery-fee")
-    public double getDeliveryFee(@RequestParam String cityName, @RequestParam String vehicleType) {
+    public DeliveryFeeResponse getDeliveryFee(@RequestParam String cityName, @RequestParam String vehicleType) {
         City city = City.valueOf(cityName.toUpperCase());
         VehicleType vehicle = VehicleType.valueOf(vehicleType.toUpperCase());
 
         double fee = deliveryFeeService.calculateFee(city, vehicle);
 
-        return fee;
+        return new DeliveryFeeResponse(cityName.toUpperCase(), vehicleType.toUpperCase(), fee);
     }
 }
