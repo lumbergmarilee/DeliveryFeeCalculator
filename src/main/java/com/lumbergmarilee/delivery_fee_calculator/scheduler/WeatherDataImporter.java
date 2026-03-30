@@ -17,17 +17,24 @@ import java.time.ZoneId;
 import java.util.List;
 
 
-
+/**
+ * Scheduled task that imports weather data from the Estonian Weather Service.
+ * Fetches XML observations and saves data for supported cities to the database.
+ * Runs once on application startup and then every hour at HH:15.
+ */
 @Component
 public class WeatherDataImporter {
 
     private final WeatherDataRepository weatherDataRepository;
 
+    /** URL of the Estonian Weather Service XML feed */
     private static final String WEATHER_URL = "https://www.ilmateenistus.ee/ilma_andmed/xml/observations.php";
+
+    /** Weather station names corresponding to supported cities */
     private static final List<String> STATIONS = List.of("Tallinn-Harku", "Tartu-Tõravere", "Pärnu");
 
-
-    @jakarta.annotation.PostConstruct // Right after startup import weather
+    /** Imports weather data immediately on application startup */
+    @jakarta.annotation.PostConstruct
     public void init() {
         importWeatherData();
     }
@@ -36,9 +43,13 @@ public class WeatherDataImporter {
         this.weatherDataRepository = weatherDataRepository;
     }
 
-    @Scheduled(cron = "0 15 * * * *") // import weather every hour at minute 15
+    /**
+     * Fetches the latest weather observations from the Estonian Weather Service XML feed,
+     * parses the data for supported stations, and saves it to the database.
+     */
+    @Scheduled(cron = "0 15 * * * *")
     public void importWeatherData() {
-        // 1. Fetch XML from the URL
+        // Fetch XML from the URL
         try{
             DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
             DocumentBuilder builder = dbFactory.newDocumentBuilder();
@@ -77,6 +88,13 @@ public class WeatherDataImporter {
         }
     }
 
+
+    /**
+     * Safely extracts the text content of a named XML element.
+     * @param element the parent XML element
+     * @param tagName the child tag name to extract
+     * @return the text content, or empty string if not found
+     */
     private String getTagValue(Element element, String tagName) {
         NodeList nodes = element.getElementsByTagName(tagName);
         if (nodes.getLength() > 0 && nodes.item(0).getTextContent() != null) {
@@ -85,6 +103,11 @@ public class WeatherDataImporter {
         return "";
     }
 
+
+    /**
+     * Safely parses a string to double.
+     * @return the parsed value, or 0.0 if the string is null or not a valid number
+     */
     private double parseDouble(String value) {
         try {
             return Double.parseDouble(value);

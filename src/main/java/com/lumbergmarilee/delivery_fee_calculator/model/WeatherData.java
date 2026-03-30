@@ -9,12 +9,22 @@ public class WeatherData {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    /** Name of the weather station (e.g., "Tallinn-Harku", "Tartu-Tõravere", "Pärnu") */
     private String stationName;
+
+    /** WMO (World Meteorological Organization) station code */
     private String wmoCode;
+
+    /** Air temperature in degrees Celsius */
     private double airTemperature;
+
+    /** Wind speed in meters per second (m/s) */
     private double windSpeed;
+
+    /** Weather phenomenon description (e.g., "Light snow shower", "Moderate rain") */
     private String weatherPhenomenon;
 
+    /** Timestamp of the weather observation. Mapped to avoid H2 reserved word conflict. */
     @Column(name = "observation_timestamp")
     private LocalDateTime timestamp;
 

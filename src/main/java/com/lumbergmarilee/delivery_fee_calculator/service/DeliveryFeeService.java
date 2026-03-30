@@ -7,6 +7,12 @@ import com.lumbergmarilee.delivery_fee_calculator.model.enums.VehicleType;
 import com.lumbergmarilee.delivery_fee_calculator.repository.WeatherDataRepository;
 import org.springframework.stereotype.Service;
 
+
+/**
+ * Service for calculating delivery fees based on city, vehicle type, and weather conditions.
+ * The total fee consists of a regional base fee (RBF) plus extra fees for
+ * air temperature (ATEF), wind speed (WSEF), and weather phenomenon (WPEF).
+ */
 @Service
 public class DeliveryFeeService {
 
@@ -16,6 +22,10 @@ public class DeliveryFeeService {
         this.weatherDataRepository = weatherDataRepository;
     }
 
+    /**
+     * Calculates the regional base fee based on city and vehicle type.
+     * @return base fee in euros
+     */
     private double calculateRBF(City city, VehicleType vehicleType){
         return switch (city){
             case TALLINN -> switch(vehicleType){
@@ -37,6 +47,13 @@ public class DeliveryFeeService {
         };
     }
 
+
+    /**
+     * Calculates extra fee based on air temperature.
+     * Only applies to Scooter and Bike.
+     * Below -10°C: 1.0€, between -10°C and 0°C: 0.5€
+     * @return extra fee in euros
+     */
     private double calculateATEF(VehicleType vehicleType, double airTemperature){
         if (vehicleType == VehicleType.CAR){ return 0;}
         // Otherwise must be type bike or scooter
@@ -46,6 +63,13 @@ public class DeliveryFeeService {
         return 0.0;
     }
 
+
+    /**
+     * Calculates extra fee based on weather phenomenon.
+     * Only applies to Scooter and Bike.
+     * Snow/sleet: 1.0€, rain: 0.5€.
+     * @throws VehicleUsageForbiddenException if phenomenon is glaze, hail, or thunder
+     */
     private double calculateWPEF(VehicleType vehicleType, String weatherPhenomenon){
         if (vehicleType == VehicleType.CAR){ return 0.0;}
         if (weatherPhenomenon == null || weatherPhenomenon.isEmpty()){return 0.0;}
@@ -64,6 +88,12 @@ public class DeliveryFeeService {
     }
 
 
+    /**
+     * Calculates extra fee based on wind speed.
+     * Only applies to Bike.
+     * Wind speed 10-20 m/s: 0.5€.
+     * @throws VehicleUsageForbiddenException if wind speed exceeds 20 m/s
+     */
     private double calculateWSEF(VehicleType vehicleType, double windSpeed){
         if (vehicleType == VehicleType.CAR || vehicleType == VehicleType.SCOOTER){ return 0;}
         if (windSpeed > 20){throw new VehicleUsageForbiddenException("Usage of selected vehicle type is forbidden due to wind speeds");}
@@ -73,6 +103,10 @@ public class DeliveryFeeService {
 
     }
 
+    /**
+     * Calculates the total delivery fee from raw weather values.
+     * Total = RBF + ATEF + WSEF + WPEF
+     */
     public double calculateDeliveryFee(City city, VehicleType vehicleType, double airTemperature, double windSpeed, String weatherPhenomenon) {
 
         double rbf = calculateRBF(city, vehicleType);
@@ -86,6 +120,15 @@ public class DeliveryFeeService {
         return rbf+atef+wsef+wpef;
     }
 
+
+    /**
+     * Calculates the delivery fee using the latest weather data from the database.
+     * This is the main entry point called by the controller.
+     * @param city the delivery city
+     * @param vehicleType the delivery vehicle type
+     * @return total delivery fee in euros
+     * @throws RuntimeException if no weather data is found for the city
+     */
     public double calculateFee(City city, VehicleType vehicleType){
         String cityName = city.getName();
         WeatherData weatherData = weatherDataRepository.findTopByStationNameOrderByTimestampDesc(cityName);
